@@ -1,0 +1,16 @@
+Exercise 1: Currently, you can only select adjacent pairs of nodes to check.
+Would the proof still be zero knowledge if you could pick arbitrary pairs of nodes to check?
+
+- 인접한 두 노드를 잇는 하나의 간선을 확인하는 경우가 ZKP인 이유는, 매 반복 실행마다 그래프의 색상을 shuffle하며, 매번 선택된 두 노드가 ‘서로 다른 색상’이기에 특정 시점에서의 그래프 상 노드의 색상 분포에 대한 정보를 얻을 수 없기 때문이다.
+- 임의의 두 노드를 선택할 수 있는 옵션을 준다면, 여러 시행에 걸쳐 ‘같은 색상’을 가지고 있는 노드의 집합을 추론할 수 있고, 이는 3 color 맵핑에 대한 정보에 대한 추론으로 이어질 수 있기에, ZKP가 아니다.
+
+Exercise 2: The equation currently being used for confidence is 1-(1/E)^n, where E is the number of edges in the graph, and n is the number of trials run.
+Is this the correct equation? Why is there no prior?
+
+
+- 주어진 예시에서 사용된 Confidence 공식은 1-(1/E)^n가 아닌, 1 - (1 - 1/E)^n이다.
+- 수식을 해석하자면, 단 1개의 간선만 invalid한 3-colored graph G(E, V)를 가정했을 때 n번의 검증을 통해 invalid한 E를 catch할 확률이다. 반대로 Prover가 invalid한 E를 포함한 그래프로 cheating에 성공할 확률은 (1 - 1/E)^n이다.
+- Confidence에 대한 이러한 해석은 Prover에 의해 제출된 그래프 G(E, V)에서 임의의 k(<=E)개의 간선이 invalid한 경우를 고려하지 않고, 최악의 경우(걸러내기 가장 어려운 경우)인 단 1개의 invalid한 간선만 존재하는 경우를 가정한다. 이러한 가정 하에서는 n번의 검증 과정이 서로 독립적인 복원 추출이므로, 위의 공식이 올바르게 유도될 수 있다.
+- 사전확률(prior)에 대해 고려하지 않는 이유는, ZKP 특성 상 베이즈 정리를 통해 ‘신뢰의 정도’로서 확률을 유도하기 어렵기 때문일 것이라고 추측된다. 1번의 valid한 간선을 확인한 후의 Soundness의 사후확률(posterior)은 P([proof가 true] | [하나의 유효한 간선을 확인])이고,
+- 이는 베이즈 정리에 의해 P([하나의 유효한 간선을 확인] | [proof가 true]) * P([proof가 true]) / P([하나의 유효한 간선을 확인])이며, 사전확률은 P([proof가 true])이다.
+- 하나의 유효한 간선을 확인하기 전, 검증자는 그래프의 상태에 대한 정보가 전혀 없으므로 해당 사전 확률을 구할 수 없고, 이에 따라 베이즈 확률이 아닌, 최악의 상황을 가정한 경우에 한정하여 빈도주의 관점으로 확률을 구한 것으로 생각된다.
